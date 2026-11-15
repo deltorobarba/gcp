@@ -131,7 +131,7 @@ Google Cloud has two services with "skill registry" in the description. They sol
 **Agent Registry** knows two kinds of skills:
 
 - **Standalone skills:** versioned ZIP bundles (instructions plus scripts) that an agent downloads into its own context. Governed across projects, independent of any single agent deployment.
-- **Inline A2A skills:** the `skills` array inside a remote agent's `agent-card.json`. They advertise what a remote agent can do, so that another agent can delegate a task to it over A2A (see [a2a.ipynb](../a2a.ipynb)). They are versioned with the Agent Card.
+- **Inline A2A skills:** the `skills` array inside a remote agent's `agent-card.json`. They advertise what a remote agent can do, so that another agent can delegate a task to it over A2A (see [a2a.ipynb](../code/a2a.ipynb)). They are versioned with the Agent Card.
 
 Skill IDs tell you who published a skill. Google-managed skills come from verified publishers (`FIRST_PARTY`, for example `urn:skill:cloud.google.com:…`) and are visible in every project. Your own skills get the prefix `private-` automatically (`private-terraform-security-review`), so they cannot collide with verified ones. You use the prefixed ID in all later commands.
 
@@ -191,7 +191,7 @@ Tech Leads review via CODEOWNERS: Is this a duplicate of an existing skill? Are 
 1. **Schema and security lint:** frontmatter valid (`skills-ref validate ./my-skill` checks the spec), size limits respected, static analysis of `scripts/`.
 2. **Trajectory evaluation:** a short eval set (`trajectory.evalset.json`) checks that the agent calls `load_skill` for the right skill on target prompts, ignores it on neighbouring prompts, and that nothing regressed. In `adk eval` this is the metric `tool_trajectory_avg_score`; the Gen AI Evaluation Service has an equivalent tool-use metric.
 
-> **Update.** The original ran these evals "against the Frankfurt Gemini endpoint". In this repo, Gemini 3.x was only available on `global` (October 2026, see [a2a.ipynb](../a2a.ipynb)). Run the evals against whichever model endpoint satisfies your residency requirement, and check the model's location table first (section 6.2).
+> **Update.** The original ran these evals "against the Frankfurt Gemini endpoint". In this repo, Gemini 3.x was only available on `global` (October 2026, see [a2a.ipynb](../code/a2a.ipynb)). Run the evals against whichever model endpoint satisfies your residency requirement, and check the model's location table first (section 6.2).
 
 ### Stage 3: organization-wide publishing
 
@@ -336,7 +336,7 @@ flowchart LR
 
 **2. Skills** hold task-specific procedures that are loaded on demand. They steer the model *probabilistically*. They are never a hard security boundary.
 
-**3. MCP servers** provide live, authenticated access to databases, Cloud Logging, issue trackers and wikis (Jira, Confluence) or ERP systems. Instead of copying brittle wrapper scripts across skills, register vetted MCP servers centrally in Agent Registry, control access with IAM (`roles/mcp.toolUser` for Google Cloud MCP servers) or with Agent Gateway authorization policies (for third-party and custom servers), and default to **read-only modes** for analysis and triage. See [mcp.ipynb](../mcp.ipynb) and [gateway.ipynb](../gateway.ipynb).
+**3. MCP servers** provide live, authenticated access to databases, Cloud Logging, issue trackers and wikis (Jira, Confluence) or ERP systems. Instead of copying brittle wrapper scripts across skills, register vetted MCP servers centrally in Agent Registry, control access with IAM (`roles/mcp.toolUser` for Google Cloud MCP servers) or with Agent Gateway authorization policies (for third-party and custom servers), and default to **read-only modes** for analysis and triage. See [mcp.ipynb](../code/mcp.ipynb) and [gateway.ipynb](../code/gateway.ipynb).
 
 **4. Hooks, sandbox and gateway** run outside the model, so the model cannot talk its way around them. Examples: block `DELETE` calls or space and table drops in Confluence and databases, screen prompts and responses for secrets and PII (Model Armor), run the linter after every file edit (`PostToolUse`). Locally in Antigravity this is the OS-level terminal sandbox plus `.agents/hooks.json`; centrally, for all MCP and agent traffic, it is Agent Gateway with Model Armor.
 
@@ -511,7 +511,7 @@ flowchart TD
 
 - **Small search space:** each subagent searches only its own 5–15 skills, so selection is precise.
 - **Context isolation:** long logs, tool traces and loaded `SKILL.md` bodies stay in the subagent's disposable context; the coordinator gets only a short structured summary.
-- **Least privilege per agent:** each subagent runs under its own identity (SPIFFE-based Agent Identity, see [identity.ipynb](../identity.ipynb)) with IAM grants only for its domain's skills and MCP servers.
+- **Least privilege per agent:** each subagent runs under its own identity (SPIFFE-based Agent Identity, see [identity.ipynb](../code/identity.ipynb)) with IAM grants only for its domain's skills and MCP servers.
 
 In ADK, subagents are `LlmAgent`s with `include_contents="none"`, wired via `sub_agents=[...]` or wrapped in `AgentTool`. In Antigravity, subagents start without the parent's conversation history and run asynchronously in the background.
 
@@ -595,7 +595,7 @@ Skill sprawl · Agent Skills specification · `SKILL.md` · Frontmatter · Trigg
 - [Agent Skills specification](https://agentskills.io/specification)
 - [Google's open-source skills (google/skills)](https://github.com/google/skills) · [agents-cli (google/agents-cli)](https://github.com/google/agents-cli)
 
-**In this repo:** [mcp.ipynb](../mcp.ipynb) (MCP server, Agent Registry) · [identity.ipynb](../identity.ipynb) (Agent Identity) · [gateway.ipynb](../gateway.ipynb) (Agent Gateway, Model Armor) · [a2a.ipynb](../a2a.ipynb) (A2A, Agent Card) · [evaluations.md](evaluations.md) (evaluating agents) · [sdlc.md](sdlc.md) (hooks, harness, lethal trifecta)
+**In this repo:** [mcp.ipynb](../code/mcp.ipynb) (MCP server, Agent Registry) · [identity.ipynb](../code/identity.ipynb) (Agent Identity) · [gateway.ipynb](../code/gateway.ipynb) (Agent Gateway, Model Armor) · [a2a.ipynb](../code/a2a.ipynb) (A2A, Agent Card) · [evaluations.md](evaluations.md) (evaluating agents) · [sdlc.md](sdlc.md) (hooks, harness, lethal trifecta)
 
 ---
 
