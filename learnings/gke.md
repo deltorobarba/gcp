@@ -5,7 +5,7 @@ Skalierung, Rollouts, Netzwerk und Supply-Chain-Sicherheit. Die Notiz erklärt d
 Beispiel und endet mit einem Spickzettel typischer Fragemuster.
 
 *Stand 2026-11-15. Prüfungsfragen benutzen oft alte Namen (Google Container Engine, Stackdriver, Container Registry,
-Anthos, kubemci); die heutigen Namen stehen in [Abschnitt 10](#10-alte-namen-in-den-fragen).*
+Anthos, kubemci); die heutigen Namen stehen in [Abschnitt 11](#11-alte-namen-in-den-fragen).*
 
 ---
 
@@ -21,9 +21,10 @@ Anthos, kubemci); die heutigen Namen stehen in [Abschnitt 10](#10-alte-namen-in-
 - [7. CI/CD für Container](#7-cicd-für-container)
 - [8. Betrieb und Observability](#8-betrieb-und-observability)
 - [9. Viele Cluster: Fleet und GKE Enterprise](#9-viele-cluster-fleet-und-gke-enterprise)
-- [10. Alte Namen in den Fragen](#10-alte-namen-in-den-fragen)
-- [11. Prüfungssignale: Spickzettel](#11-prüfungssignale-spickzettel)
-- [12. Quellen](#12-quellen)
+- [10. Kosten](#10-kosten)
+- [11. Alte Namen in den Fragen](#11-alte-namen-in-den-fragen)
+- [12. Prüfungssignale: Spickzettel](#12-prüfungssignale-spickzettel)
+- [13. Quellen](#13-quellen)
 
 ---
 
@@ -431,7 +432,21 @@ flowchart TB
 
 ---
 
-## 10. Alte Namen in den Fragen
+## 10. Kosten
+
+| Hebel | Was er bringt |
+|---|---|
+| **Abrechnungsmodell kennen** | beide Modi: eine Gebühr pro Cluster. Dazu bei Standard die Nodes (VMs), auch halb leere; bei Autopilot die **Resource Requests** der Pods |
+| **Requests passend setzen** | zu hohe Requests reservieren Kapazität, die niemand nutzt (bei Autopilot direkt auf der Rechnung); der VerticalPodAutoscaler schlägt passende Werte vor |
+| **HPA plus Cluster Autoscaler** | Pods und Nodes folgen der Last, statt dauerhaft für die Spitze bereitzustehen |
+| **Spot-Node-Pools** | fehlertolerante Workloads (Batch, CI, Training mit Checkpoints) deutlich günstiger |
+| **Committed Use Discounts** | Rabatt für die Grundlast, die ohnehin immer läuft |
+| **Kosten zuordnen** | GKE Cost Allocation verteilt die Kosten im Billing Export auf Namespaces und Labels, z. B. pro Team |
+| **Scale-down nicht blockieren** | Pods ohne Controller, strenge PodDisruptionBudgets oder `safe-to-evict: false` verhindern, dass leere Nodes verschwinden |
+
+---
+
+## 11. Alte Namen in den Fragen
 
 | In der Frage | Heute |
 |---|---|
@@ -447,7 +462,7 @@ flowchart TB
 
 ---
 
-## 11. Prüfungssignale: Spickzettel
+## 12. Prüfungssignale: Spickzettel
 
 | Wenn die Frage sagt … | … ist die Antwort meist |
 |---|---|
@@ -475,7 +490,7 @@ flowchart TB
 
 ---
 
-## 12. Quellen
+## 13. Quellen
 
 - [GKE overview](https://docs.cloud.google.com/kubernetes-engine/docs/concepts/kubernetes-engine-overview)
 - [Autopilot overview](https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview)

@@ -11,7 +11,7 @@
 
 ## Security: Authorization and Authentification
 
-- [0. Das mentale Modell: drei Fragen, immer dieselben](#0.-Das-mentale-Modell:-drei-Fragen,-immer-dieselben)
+- [0. Das mentale Modell: drei Fragen, immer dieselben](#0-das-mentale-modell-drei-fragen-immer-dieselben)
 
 ## AI for Software Engineering (SDLC)
 
