@@ -9,3 +9,5 @@
 * [A2A](https://github.com/deltorobarba/gcp/blob/main/a2a.ipynb): Agent-to-Agent 1.0, Agent Card, A2aAgent server, a2a-sdk client, Agent Identity, mTLS, custom IAM role
 * [Github](https://github.com/deltorobarba/gcp/blob/main/github.ipynb): GitHub MCP server, Secret Manager, tool filter, prompt injection, Auth Manager
 * [SDLC](https://github.com/deltorobarba/gcp/blob/main/sdlc.md): AI for Agent authentication and authorization, access vs. ID tokens, ADC, SDLC agenda
+* [Skills](https://github.com/deltorobarba/gcp/blob/main/skill.md): Agent Skills at scale, SKILL.md, Agent Registry lifecycle and revisions, 3-stage governance, rules vs. skills vs. MCP vs. hooks, top-k skill retrieval, domain subagents
+* [Authentification](https://github.com/deltorobarba/gcp/blob/main/authentification.md): Bausteine (Agent, Runtime, MCP, A2A, Identity), OIDC vs. Access-Token, Registry header_provider, Fehlerbilder 401/403, Google-managed OAuth
