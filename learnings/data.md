@@ -70,7 +70,7 @@ flowchart LR
 | Bestellungen | Transaktionen, relational, eine Region | **Cloud SQL** |
 | Nutzerprofile in der App | Dokumente, Synchronisation mit Mobilgeräten | **Firestore** |
 | Sessions | flüchtig, sehr schnell, von allen Servern lesbar | **Memorystore** |
-| Produktbilder, Trainingsdateien, Archive | Dateien beliebiger Größe | **Cloud Storage** |
+| Produktbilder, Trainingsdateien, Archive | Dateien beliebiger Größe | **Cloud Storage** (Bilder ausgeliefert über Cloud CDN) |
 
 ---
 
@@ -162,6 +162,50 @@ Bandarchiven).
   zufällige Vorsilbe verteilt die Last.
 - **Cloud Storage FUSE** (`gcsfuse`) bindet einen Bucket wie ein Verzeichnis ein, z. B. damit ein Trainingsskript
   Bilder direkt aus dem Bucket liest.
+
+
+### Medien schnell ausliefern: Cloud Storage plus Cloud CDN
+
+Bilder, Musik und Videos liegen am besten in **Cloud Storage**. Schnell abrufbar für Nutzer weltweit werden sie aber
+erst durch **Cloud CDN** davor. Ohne CDN läuft jeder Abruf bis zum Bucket in seiner Region: Nutzer in Asien warten auf
+einen Bucket in Iowa, und ein beliebtes Video wird tausendfach vom selben Ursprung geholt.
+
+So sieht die Kette aus:
+
+```mermaid
+flowchart LR
+    U["Nutzer in Tokio"] --> EDGE["Google-Edge in Tokio<br/>globaler Application LB<br/>mit Cloud CDN"]
+    EDGE -- "Cache-Treffer:<br/>sofort vom Edge" --> U
+    EDGE -- "Cache-Fehlschlag:<br/>einmal beim Ursprung holen" --> BB["Backend Bucket<br/>Cloud Storage us-central1"]
+    EDGE -- "/api/*: dynamisch,<br/>nicht gecacht" --> APP["Backend Service<br/>MIG oder Cloud Run"]
+```
+
+1. Die Medien liegen in einem Bucket.
+2. Der Bucket hängt als **Backend Bucket** an einem **globalen externen Application Load Balancer**. Die URL Map
+   schickt z. B. `/media/*` an den Bucket und `/api/*` an die Anwendung.
+3. Am Backend Bucket schaltet man **Cloud CDN** ein. Der erste Abruf einer Datei an einem Edge-Standort holt sie aus
+   dem Bucket (Cache-Fehlschlag), alle weiteren kommen direkt vom Edge (Cache-Treffer). Wie lange eine Datei im Cache
+   bleibt, steuern Cache-Modus, TTL und der `Cache-Control`-Header.
+4. Private Inhalte (z. B. nur für zahlende Nutzer) schützt man mit **Signed URLs** oder **Signed Cookies** von Cloud
+   CDN.
+
+Die Medien laufen dabei **nicht durch die eigenen VMs**. Bucket und CDN liefern direkt aus, die Anwendung kümmert sich
+nur um die dynamischen Inhalte. Medien über VMs auszuliefern, die den Bucket per `gcsfuse` oder eine
+Filestore-Freigabe einbinden, ist in Prüfungsfragen deshalb meist die falsche Antwort.
+
+| Bedarf | Lösung |
+|---|---|
+| Bilder, CSS, JS, Musik und Downloads einer Website für Nutzer weltweit | **Cloud CDN** am globalen Application LB, Bucket als Backend Bucket |
+| Video-Streaming (live oder auf Abruf) und sehr große Dateien für sehr viele Zuschauer | **Media CDN**, speziell für Medien-Streaming gebaut, mit Cloud Storage als Ursprung |
+| Dateien hochverfügbar und nahe an mehreren Regionen, auch ohne Website | **Multi-Region-Bucket** (für weltweite Nutzer zusätzlich Cloud CDN) |
+| Medien als Trainingsdaten für GPU-VMs | **Cloud Storage FUSE** (`gcsfuse`) |
+| Uploads direkt aus dem Browser in den Bucket | **Signed URL** plus CORS ([security.md](security.md#9-sensible-daten-schützen)) |
+
+**Falle:** Media CDN ist für Streaming und große Downloads gedacht. Für die statischen Inhalte einer Website (Bilder,
+CSS, JS) ist Cloud CDN die richtige Antwort, auch wenn „Media“ im Namen verlockend klingt.
+
+Cache Keys und Trefferquote, Invalidierung und die Einbindung in den Load Balancer stehen ausführlich in
+[networking.md](networking.md#13-statische-inhalte-und-cloud-cdn).
 
 ---
 
@@ -433,6 +477,10 @@ Batch-Analysen in BigQuery.
 | Dokumente 5 Jahre unveränderbar | Retention Policy plus Bucket Lock |
 | Schutz vor Überschreiben und Löschen | Object Versioning |
 | Downloads für Kunden weltweit | Multi-Region-Bucket |
+| beliebte Mediendateien laden langsam oder scheitern | Bucket als Backend Bucket am globalen Application LB, Cloud CDN einschalten |
+| statische Inhalte weltweit schnell (Bilder, CSS, JS) | Cloud CDN am globalen externen Application LB |
+| Video-Streaming für sehr viele Zuschauer | Media CDN |
+| Shop mit vielen Bildern und Videos, Seiten langsam | Cloud CDN plus Memorystore |
 | Cloud Storage antwortet mit 429 oder 5xx | Wiederholen mit exponentiellem Backoff |
 | 10 TB einmalig hochladen | `gcloud storage cp` |
 | Daten von einem anderen Cloud-Anbieter | Storage Transfer Service |
