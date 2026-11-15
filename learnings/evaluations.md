@@ -398,7 +398,7 @@ Urteil fehlen.
 
 ### 4.3 Angewendet auf models.ipynb
 
-In [models.ipynb](models.ipynb) vergleichen die Zellen „Model Benchmark“ (Geschwindigkeit und LLM-as-a-Judge) und
+In [models.ipynb](../models.ipynb) vergleichen die Zellen „Model Benchmark“ (Geschwindigkeit und LLM-as-a-Judge) und
 „Model Evaluation“ (Gen AI Evaluation Service mit der Rubrik `GENERAL_QUALITY`) Gemini 3.8 Flash mit DeepSeek V4.1
 Flash auf 10 Prompts mit je einem Lauf. Was sich daraus ableitet:
 
@@ -496,7 +496,7 @@ Die Zeitangaben sind eine Einschätzung, nicht gemessen.
 3. **Nach ein bis zwei Wochen:** Arena (braucht erst genug Stimmen, bis dahin „vorläufig“), SWE-bench Pro (SEAL),
    Terminal-Bench, τ-Bench, MCP-Atlas, HLE, GDPx.
 4. **Nach Wochen bis Monaten:** METR (falls noch gepflegt), FrontierMath, der nächste Wettbewerb bei MathArena, HAL.
-5. **Eigene Evaluation:** die Zellen in [models.ipynb](models.ipynb) mit der neuen Modell-ID laufen lassen (Latenz,
+5. **Eigene Evaluation:** die Zellen in [models.ipynb](../models.ipynb) mit der neuen Modell-ID laufen lassen (Latenz,
    Model Evaluation). Das ist die Ebene „Modell im festen Harness“ mit dem eigenen Harness.
 6. **Abschnitt 5 aktualisieren**, mit Datum. Die alte Fassung bleibt in der Git-Historie.
 
